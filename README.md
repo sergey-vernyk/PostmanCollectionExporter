@@ -52,7 +52,6 @@ The script will fail gracefully if no API key is found.
 
 ```
 .
-├── exported_collections
 ├── pyproject.toml
 ├── README.md
 ├── requirements.txt

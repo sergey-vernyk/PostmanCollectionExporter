@@ -73,9 +73,9 @@ The script will fail gracefully if no API key is found.
 
 ## 🧹 TODO
 
-- [ ] Add unit tests
-- [ ] Add GitHub Actions CI
-- [ ] Improve logging
+- [x] Add unit tests
+- [x] Add GitHub Actions CI
+- [x] Improve logging
 
 ---
 

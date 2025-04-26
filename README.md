@@ -7,16 +7,14 @@ Export your Postman collections into local JSON files via a simple CLI.
 ## 🚀 Usage
 
 ```bash
-python src/export.py --path exported_collections -n Collection1 -n Collection2
+python src/export.py --path /home/user/exports -n Collection1 -n Collection2
+# or
+json_exporter --path /home/user/exports -n Collection1 -n Collection2
 ```
 
 - `--path` / `-p`: Path to the directory where collections will be saved.
 - `--collection-names` / `-n`: Names of the collections to export (you can pass multiple).
 
-Example:
-```bash
-python src/json_exporter.py -p exported_collections -n Collection1 -n Collection2
-```
 ---
 
 ## ⚙️ Requirements

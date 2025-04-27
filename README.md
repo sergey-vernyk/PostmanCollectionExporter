@@ -7,7 +7,7 @@ Export your Postman collections into local JSON files via a simple CLI.
 ## ✨ Features
 
 - **Export Multiple Collections**: Export several Postman collections simultaneously with just a few commands.
-- **Asynchronous API Interaction**: Leverages asyncio and httpx for efficient, non-blocking communication with the Postman API.
+- **Asynchronous API Interaction**: Leverages asyncio, httpx, aiofiles for efficient, non-blocking communication with the Postman API.
 - **Save Collections in JSON Format**: Save Postman collections locally in a clean, standardized JSON format.
 - **CLI Built with asyncclick library**: A powerful and user-friendly command-line interface, built with asyncclick to handle async operations gracefully.
 - **Error Handling**: Gracefully handles errors from the Postman API, ensuring that authentication issues or rate limits are reported clearly.
@@ -16,8 +16,9 @@ Export your Postman collections into local JSON files via a simple CLI.
 ## 🚀 Usage
 
 ```bash
-python src/json_exporter.py --path /home/user/exports -n Collection1 -n Collection2 --api-key postman-api-key 
-# or
+# using direct main function (--api-key is optional)
+python src/cli.py --path /home/user/exports -n Collection1 -n Collection2 --api-key postman-api-key 
+# using CLI command (--api-key is optional)
 export-postman --path /home/user/exports -n Collection1 -n Collection2 --api-key postman-api-key
 ```
 
@@ -64,9 +65,11 @@ The script will fail gracefully if no API key is found.
 ├── README.md
 ├── requirements.txt
 └── src
+    ├── cli.py
     ├── exceptions.py
-    ├── __init__.py
-    └── json_exporter.py
+    ├── exporters.py
+    ├── helpers.py
+    └── __init__.py
 ```
 
 ---

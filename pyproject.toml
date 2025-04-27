@@ -5,12 +5,7 @@ description = "Export Postman collections to JSON files via CLI."
 authors = [{ name = "Sergey Vernigora", email = "volt.awp.dev@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
-    "asyncclick",
-    "httpx",
-    "anyio",
-    "aiofiles"
-]
+dependencies = ["asyncclick", "httpx", "anyio", "aiofiles"]
 
 [project.scripts]
-export-postman = "json_exporter:export"
+export-postman = "cli:export"

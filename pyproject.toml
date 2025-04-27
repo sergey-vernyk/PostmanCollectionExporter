@@ -9,7 +9,6 @@ dependencies = [
     "asyncclick",
     "httpx",
     "anyio",
-    "python-dotenv"
 ]
 
 [project.scripts]

@@ -1,4 +1,12 @@
-class PostmanRetrieveCollectionError(Exception):
+class PostmanAPIError(Exception):
+    """Base class for all Postman-related exceptions."""
+
+
+class EnvironmentVariablesMissingError(EnvironmentError):
+    """Exception raised when there is environment variable is not found."""
+
+
+class PostmanCollectionRetrievalError(PostmanAPIError):
     """Exception raised when there is an error retrieving a Postman collection."""
 
     def __init__(self, status_code: int) -> None:
@@ -8,7 +16,7 @@ class PostmanRetrieveCollectionError(Exception):
         )
 
 
-class PostmanAuthenticationError(Exception):
+class PostmanAuthenticationError(PostmanAPIError):
     """Exception raised when there is an authentication error with the Postman API."""
 
     def __init__(self, message: str) -> None:
@@ -16,14 +24,14 @@ class PostmanAuthenticationError(Exception):
         super().__init__(message)
 
 
-class PostmanToManyRequestsError(Exception):
+class PostmanTooManyRequestsError(PostmanAPIError):
     """Exception raised when the Postman API rate limit is exceeded (HTTP 429)."""
 
     def __init__(self) -> None:
         super().__init__("To many requests to API. Try again later.")
 
 
-class PostmanResponseNotHaveKey(Exception):
+class PostmanResponseMissingKeyError(PostmanAPIError):
     """Exception raised when a required key is missing in the Postman API response."""
 
     def __init__(self, key: str) -> None:
@@ -31,7 +39,7 @@ class PostmanResponseNotHaveKey(Exception):
         super().__init__(f"Response with collection does not have key '{key}'.")
 
 
-class PostmanCollectionNotFound(Exception):
+class PostmanCollectionNotFoundError(PostmanAPIError):
     """Exception raised when a Postman collection with the specified name is not found."""
 
     def __init__(self, name: str) -> None:

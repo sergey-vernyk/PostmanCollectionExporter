@@ -10,7 +10,6 @@ from urllib.parse import parse_qs
 import anyio
 import asyncclick
 import httpx
-from dotenv import load_dotenv
 
 from exceptions import (
     PostmanAuthenticationError,
@@ -20,10 +19,49 @@ from exceptions import (
     PostmanToManyRequestsError,
 )
 
-load_dotenv(Path(__name__).absolute().parent / ".env")
-
 POSTMAN_API_BASE_URL = "https://api.getpostman.com"
-POSTMAN_API_KEY = os.environ.get("POSTMAN_API_KEY")
+
+
+@asyncclick.command(
+    help="Export Postman collections into JSON format to provided path."
+)
+@asyncclick.option(
+    "--path",
+    "-p",
+    type=asyncclick.types.Path(file_okay=False, dir_okay=True, exists=False),
+    required=True,
+    help="Path to the directory, where exported collections should be located.",
+)
+@asyncclick.option(
+    "--collection-names",
+    "-n",
+    required=True,
+    multiple=True,
+    help="Names of the collections to be exported, separated by comma.",
+)
+@asyncclick.option(
+    "--api-key",
+    "-k",
+    required=False,
+    type=asyncclick.STRING,
+    help="Postman API key for authentication.",
+)
+async def export(
+    path: str, collection_names: tuple[str, ...], api_key: str | None = None
+) -> None:
+    """Starting point for exporting collections."""
+    _path = Path(path)
+    _path.mkdir(parents=True, exist_ok=True)
+
+    if api_key is not None:
+        os.environ["POSTMAN_API_KEY"] = api_key
+
+    try:
+        uids = await get_collections_uids_by_names(collection_names)
+        await export_collections_to_json(uids, _path)
+    except PostmanAuthenticationError as e:
+        asyncclick.secho(str(e), fg="red", err=True)
+        sys.exit(1)
 
 
 async def export_collections_to_json(uids: Iterable[str], export_path: Path) -> None:
@@ -44,20 +82,22 @@ async def export_collections_to_json(uids: Iterable[str], export_path: Path) -> 
         PostmanToManyRequestsError: If the API returns a 429 status code (too many requests).
         PostmanRetrieveCollectionError: If the API returns an unexpected status code.
         PostmanResponseNotHaveKey: If the expected data key is missing in the response.
-        EnvironmentError: If POSTMAN_API_KEY not provided in '.env' file.
+        EnvironmentError: If POSTMAN_API_KEY neither exported into environment nor provided via --api-key parameter.
 
 
     Returns:
         None: This function performs an I/O operation (saving files) and does not return a value.
     """
-    if not POSTMAN_API_KEY:
-        raise EnvironmentError("POSTMAN_API_KEY must be provided in '.env' file.")
-
+    if not (postman_api_key := os.environ.get("POSTMAN_API_KEY", "")):
+        raise EnvironmentError(
+            "POSTMAN_API_KEY must be provided either in ENVIRONMENT (export POSTMAN_API_KEY=<key>) "
+            "or passed in api-key parameter (--api-key <key>)"
+        )
     async with httpx.AsyncClient(base_url=POSTMAN_API_BASE_URL) as client:
         tasks = [
             client.get(
                 f"/collections/{uid}",
-                headers={"X-API-Key": POSTMAN_API_KEY},
+                headers={"X-API-Key": postman_api_key},
             )
             for uid in uids
         ]
@@ -102,10 +142,13 @@ async def get_collections_uids_by_names(names: Iterable[str]) -> list[str]:
         PostmanRetrieveCollectionError: For any other HTTP error during collection retrieval.
         PostmanResponseNotHaveKey: If the expected keys are missing in the API response.
         PostmanCollectionNotFound: If no collection is found for a provided name.
-        EnvironmentError: If POSTMAN_API_KEY not provided in '.env' file.
+        EnvironmentError: If POSTMAN_API_KEY neither exported into environment nor provided via --api-key parameter.
     """
-    if not POSTMAN_API_KEY:
-        raise EnvironmentError("POSTMAN_API_KEY must be provided in '.env' file.")
+    if not (postman_api_key := os.environ.get("POSTMAN_API_KEY", "")):
+        raise EnvironmentError(
+            "POSTMAN_API_KEY must be provided either in ENVIRONMENT (export POSTMAN_API_KEY=<key>) "
+            "or passed in api-key parameter (--api-key <key>)"
+        )
 
     collections_uids: list[str] = []
 
@@ -113,7 +156,7 @@ async def get_collections_uids_by_names(names: Iterable[str]) -> list[str]:
         tasks = [
             client.get(
                 "/collections/",
-                headers={"X-API-Key": POSTMAN_API_KEY},
+                headers={"X-API-Key": postman_api_key},
                 params={"name": name},
             )
             for name in names
@@ -145,36 +188,6 @@ async def get_collections_uids_by_names(names: Iterable[str]) -> list[str]:
             raise PostmanCollectionNotFound(name) from e
 
     return collections_uids
-
-
-@asyncclick.command(
-    help="Export Postman collections into JSON format to provided path."
-)
-@asyncclick.option(
-    "--path",
-    "-p",
-    type=asyncclick.types.Path(file_okay=False, dir_okay=True, exists=False),
-    required=True,
-    help="Path to the directory, where exported collections should be located.",
-)
-@asyncclick.option(
-    "--collection-names",
-    "-n",
-    required=True,
-    multiple=True,
-    help="Names of the collections to be exported, separated by comma.",
-)
-async def export(path: str, collection_names: tuple[str, ...]) -> None:
-    """Starting point for exporting collections."""
-    _path = Path(path)
-    _path.mkdir(parents=True, exist_ok=True)
-
-    try:
-        uids = await get_collections_uids_by_names(collection_names)
-        await export_collections_to_json(uids, _path)
-    except PostmanAuthenticationError as e:
-        asyncclick.secho(str(e), fg="red", err=True)
-        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -16,13 +16,14 @@ Export your Postman collections into local JSON files via a simple CLI.
 ## 🚀 Usage
 
 ```bash
-python src/json_exporter.py --path /home/user/exports -n Collection1 -n Collection2
+python src/json_exporter.py --path /home/user/exports -n Collection1 -n Collection2 --api-key postman-api-key 
 # or
-export-postman --path /home/user/exports -n Collection1 -n Collection2
+export-postman --path /home/user/exports -n Collection1 -n Collection2 --api-key postman-api-key
 ```
 
 - `--path` / `-p`: Path to the directory where collections will be saved.
 - `--collection-names` / `-n`: Names of the collections to export (you can pass multiple).
+- `--api-key` / `-k`: Postman API key for authentication.
 
 ---
 
@@ -45,10 +46,10 @@ poetry install
 
 ## 📑 Environment Variables
 
-Create a `.env` file and provide your Postman API key:
+Export API key into terminal via command (optional):
 
-```env
-POSTMAN_API_KEY=your-postman-api-key-here
+```bash
+export POSTMAN_API_KEY=<actual_api_key>
 ```
 
 The script will fail gracefully if no API key is found.

@@ -89,4 +89,8 @@ The script will fail gracefully if no API key is found.
 
 ---
 
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
 
+## Authors
+Sergey Vernigora volt.awp.dev@gmail.com

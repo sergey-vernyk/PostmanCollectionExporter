@@ -9,6 +9,7 @@ dependencies = [
     "asyncclick",
     "httpx",
     "anyio",
+    "aiofiles"
 ]
 
 [project.scripts]

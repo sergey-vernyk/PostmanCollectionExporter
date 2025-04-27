@@ -8,7 +8,7 @@ from typing import Iterable
 from urllib.parse import parse_qs
 
 import anyio
-import asyncclick
+import asyncclick as click
 import httpx
 
 from exceptions import (
@@ -22,34 +22,48 @@ from exceptions import (
 POSTMAN_API_BASE_URL = "https://api.getpostman.com"
 
 
-@asyncclick.command(
-    help="Export Postman collections into JSON format to provided path."
-)
-@asyncclick.option(
+@click.command(help="Export Postman collections into JSON format to provided path.")
+@click.option(
     "--path",
     "-p",
-    type=asyncclick.types.Path(file_okay=False, dir_okay=True, exists=False),
+    type=click.types.Path(file_okay=False, dir_okay=True, exists=False),
     required=True,
     help="Path to the directory, where exported collections should be located.",
 )
-@asyncclick.option(
+@click.option(
     "--collection-names",
     "-n",
     required=True,
     multiple=True,
     help="Names of the collections to be exported, separated by comma.",
 )
-@asyncclick.option(
+@click.option(
     "--api-key",
     "-k",
     required=False,
-    type=asyncclick.STRING,
+    type=click.STRING,
     help="Postman API key for authentication.",
 )
 async def export(
     path: str, collection_names: tuple[str, ...], api_key: str | None = None
 ) -> None:
-    """Starting point for exporting collections."""
+    """
+    Exports selected Postman collections to JSON files.
+
+    This function is intended to be the CLI entry point for exporting collections.
+    It prepares the export directory, optionally sets the API key in the environment,
+    retrieves the collection UIDs by their names, and then saves each collection
+    to a JSON file.
+
+    Args:
+        path (str): The directory where exported collection JSON files will be saved.
+        collection_names (tuple[str, ...]): A tuple of collection names to export.
+        api_key (str | None, optional): A Postman API key. If provided, it overrides
+            the environment variable POSTMAN_API_KEY for this export session.
+
+    Raises:
+        SystemExit: Exits with code 1 if authentication with Postman API fails.
+    """
     _path = Path(path)
     _path.mkdir(parents=True, exist_ok=True)
 
@@ -60,7 +74,7 @@ async def export(
         uids = await get_collections_uids_by_names(collection_names)
         await export_collections_to_json(uids, _path)
     except PostmanAuthenticationError as e:
-        asyncclick.secho(str(e), fg="red", err=True)
+        click.secho(str(e), fg="red", err=True)
         sys.exit(1)
 
 
@@ -102,28 +116,27 @@ async def export_collections_to_json(uids: Iterable[str], export_path: Path) -> 
             for uid in uids
         ]
 
-        responses: list[httpx.Response] = await asyncio.gather(*tasks)
+        today = datetime.now().date()
 
-    for response in responses:
-        data = response.json()
-        if not response.is_success:
-            match response.status_code:
-                case 401:
-                    raise PostmanAuthenticationError(data["error"]["message"])
-                case 429:
-                    raise PostmanToManyRequestsError
-                case _:
-                    raise PostmanRetrieveCollectionError(response.status_code)
+        for coro in asyncio.as_completed(tasks):
+            response = await coro
+            data = response.json()
+            if not response.is_success:
+                match response.status_code:
+                    case 401:
+                        raise PostmanAuthenticationError(data["error"]["message"])
+                    case 429:
+                        raise PostmanToManyRequestsError
+                    case _:
+                        raise PostmanRetrieveCollectionError(response.status_code)
 
-        try:
-            collection_name = (
-                f"{data['collection']['info']['name']}_{datetime.now().date()}.json"
-            )
-        except KeyError as e:
-            raise PostmanResponseNotHaveKey(e.args[0]) from e
+            try:
+                collection_name = f"{data['collection']['info']['name']}_{today}.json"
+            except KeyError as e:
+                raise PostmanResponseNotHaveKey(e.args[0]) from e
 
-        with open(export_path / collection_name, "w", encoding="utf-8") as fp:
-            json.dump(data, fp, indent=4)
+            with open(export_path / collection_name, "w", encoding="utf-8") as fp:
+                json.dump(data, fp, indent=4)
 
 
 async def get_collections_uids_by_names(names: Iterable[str]) -> list[str]:

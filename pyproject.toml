@@ -7,6 +7,16 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["asyncclick", "httpx", "anyio", "aiofiles"]
 license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/*"]
+
 
 [project.scripts]
-export-postman = "cli:export"
+export-collections = "cli:export"
+archive-collections = "cli:archive"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

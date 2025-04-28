@@ -6,6 +6,7 @@ authors = [{ name = "Sergey Vernigora", email = "volt.awp.dev@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["asyncclick", "httpx", "anyio", "aiofiles"]
+license = "MIT"
 
 [project.scripts]
 export-postman = "cli:export"

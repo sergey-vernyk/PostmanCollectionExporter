@@ -1,5 +1,7 @@
 import os
+import shutil
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import anyio
@@ -8,6 +10,13 @@ import asyncclick as click
 import exceptions
 import exporters
 import helpers
+
+
+@click.group(help="CLI entry point providing commands for Postman collections.")
+def cli() -> None:
+    """
+    CLI entry point for interacting with Postman collections.
+    """
 
 
 @click.command(
@@ -76,5 +85,91 @@ async def export(
     )
 
 
+@click.command(
+    help="Archive a directory containing Postman collections into an archive file."
+)
+@click.option(
+    "--path-to-collections",
+    "-p",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    help="Path to directory with collections being archived.",
+)
+@click.option(
+    "--path-to-archive",
+    "-c",
+    type=click.Path(exists=False, dir_okay=True, file_okay=False),
+    help="Path to directory with an archive being created.",
+)
+@click.option(
+    "--name",
+    "-n",
+    type=click.STRING,
+    required=True,
+    help="Name of the archive being created.",
+)
+@click.option(
+    "--archive-type",
+    required=False,
+    default="zip",
+    type=click.Choice(
+        ("zip", "tar", "gztar", "bztar", "xztar"),
+        case_sensitive=False,
+    ),
+    help="Type of an archive being created.",
+)
+async def archive(
+    path_to_collections: str, path_to_archive: str, name: str, archive_type: str = "zip"
+) -> None:
+    """
+    Archive a directory containing exported Postman collections.
+
+    This command creates an archive file (ZIP, TAR, etc.) from the specified
+    directory containing exported Postman collection JSON files.
+
+    Args:
+        path_to_collections (str): Path to the directory with exported collections.
+        path_to_archive (str): Path to the directory where the archive will be saved.
+        name (str): Base name of the resulting archive file.
+        archive_type (str, optional): Archive format (zip, tar, gztar, bztar, xztar). Defaults to "zip".
+
+    Raises:
+        ValueError: If provided unknown archive format.
+        NotADirectoryError: If the archive dir path is not a directory.
+    """
+    _collections_path = Path(path_to_collections)
+    _archive_path = Path(path_to_archive)
+    _archive_path.mkdir(exist_ok=True, parents=True)
+
+    archive_name = str(_archive_path / f"{name}_{datetime.now().date()}")
+
+    if len(os.listdir(_collections_path)):
+        try:
+            shutil.make_archive(
+                archive_name,
+                archive_type,
+                root_dir=_collections_path,
+                verbose=True,
+            )
+        except (ValueError, NotADirectoryError) as e:
+            click.secho(str(e), fg="red", err=True)
+            sys.exit(1)
+
+        click.secho(
+            f"Archive '{archive_name.rsplit('/', maxsplit=1)[-1]}.{archive_type}' "
+            f"has been created in '{_archive_path}' directory.",
+            fg="green",
+        )
+    else:
+        click.secho(
+            f"There are no collection files are found in '{_collections_path}' directory.",
+            fg="red",
+            err=True,
+        )
+        sys.exit(1)
+
+
+cli.add_command(export, name="Export collections")
+cli.add_command(archive, name="Archive collections")
+
 if __name__ == "__main__":
-    anyio.run(export.main)
+    anyio.run(cli)

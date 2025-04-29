@@ -1,22 +1,24 @@
 [project]
 name = "postman-collection-exporter"
-version = "0.1.0"
-description = "Export Postman collections to JSON files via CLI."
+version = "0.1.1.dev2"
+description = "Export Postman collections via CLI."
 authors = [{ name = "Sergey Vernigora", email = "volt.awp.dev@gmail.com" }]
+maintainers = [{ name = "Sergey Vernigora", email = "volt.awp.dev@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["asyncclick", "httpx", "anyio", "aiofiles"]
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
+keywords = ["postman", "json", "export", "cli"]
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/*"]
+dependencies = ["asyncclick", "httpx", "anyio", "aiofiles"]
 
+[project.optional-dependencies]
+test = ["pytest"]
 
 [project.scripts]
-export-collections = "cli:export"
-archive-collections = "cli:archive"
+export-collections = "postman_collection_exporter.cli:export"
+archive-collections = "postman_collection_exporter.cli:archive"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"

@@ -47,19 +47,6 @@ archive-collections --path-to-collections /home/user/exports --path-to-archive /
 ## ⚙️ Requirements
 
 - Python 3.11+
-- Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Or if you're using Poetry:
-
-```bash
-poetry install
-```
-
----
 
 ## 📑 Environment Variables
 

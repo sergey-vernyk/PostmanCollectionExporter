@@ -55,7 +55,8 @@ async def export(
         api_key (str | None, optional): Postman API key for authentication. Defaults to None.
 
     Raises:
-        SystemExit: If any error with the Postman API occurred or no environment variable is found.
+        PostmanAPIError: If any error with the Postman API occurred or no environment variable is found.
+        EnvironmentVariablesMissingError: If POSTMAN_API_KEY environment variable is not set.
     """
     _path = Path(path)
     _path.mkdir(parents=True, exist_ok=True)

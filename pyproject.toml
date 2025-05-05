@@ -13,7 +13,14 @@ keywords = ["postman", "json", "export", "cli"]
 dependencies = ["asyncclick", "httpx", "anyio", "aiofiles"]
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = ["pytest", "trio", "pytest-asyncio"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests/",
+]
+asyncio_default_fixture_loop_scope = "function"
+asyncio_mode = "auto"
 
 [project.scripts]
 export-collections = "postman_collection_exporter.cli:export"

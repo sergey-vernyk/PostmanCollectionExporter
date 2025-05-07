@@ -83,6 +83,7 @@ async def export(
     )
 
 
+# TODO add properly handling collection names with spaces
 @click.command(
     help="Archive a directory containing Postman collections into an archive file."
 )
@@ -143,13 +144,9 @@ async def archive(
     archive_name = _archive_path / f"{name}_{datetime.now().date()}"
 
     try:
-        helpers.archive_collections(_collections_path, archive_type, str(archive_name))
+        helpers.archive_collections(_collections_path, str(archive_name), archive_type)
     except (exceptions.ArchiveCreateError, FileNotFoundError) as e:
-        click.secho(
-            str(e),
-            fg="red",
-            err=True,
-        )
+        click.secho(str(e), fg="red", err=True)
         sys.exit(1)
 
     click.secho(

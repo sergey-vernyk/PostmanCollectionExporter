@@ -37,7 +37,7 @@ async def get_collections_content(
         PostmanResponseNotHaveKey: If required keys are missing in the API response.
     """
     if not (postman_api_key := os.environ.get("POSTMAN_API_KEY", "")):
-        raise exceptions.EnvironmentVariablesMissingError(
+        raise exceptions.EnvironmentVariableMissingError(
             "POSTMAN_API_KEY must be provided either in ENVIRONMENT (export POSTMAN_API_KEY=<key>) "
             "or passed in api-key parameter (--api-key <key>)"
         )
@@ -98,7 +98,7 @@ async def get_collections_uids_by_names(names: Iterable[str]) -> list[str]:
         PostmanCollectionNotFound: If a collection with the specified name is not found.
     """
     if not (postman_api_key := os.environ.get("POSTMAN_API_KEY", "")):
-        raise exceptions.EnvironmentVariablesMissingError(
+        raise exceptions.EnvironmentVariableMissingError(
             "POSTMAN_API_KEY must be provided either in ENVIRONMENT (export POSTMAN_API_KEY=<key>) "
             "or passed in api-key parameter (--api-key <key>)"
         )

@@ -72,7 +72,7 @@ async def export(
 
     except (
         exceptions.PostmanAPIError,
-        exceptions.EnvironmentVariablesMissingError,
+        exceptions.EnvironmentVariableMissingError,
     ) as e:
         click.secho(str(e), fg="red", err=True)
         sys.exit(1)

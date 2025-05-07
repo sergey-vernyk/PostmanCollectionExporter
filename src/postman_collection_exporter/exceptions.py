@@ -2,7 +2,7 @@ class PostmanAPIError(Exception):
     """Base class for all Postman-related exceptions."""
 
 
-class EnvironmentVariablesMissingError(EnvironmentError):
+class EnvironmentVariableMissingError(EnvironmentError):
     """Exception raised when there is environment variable is not found."""
 
 

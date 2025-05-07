@@ -1,0 +1,210 @@
+{
+    "collection": {
+        "info": {
+            "_postman_id": "postman_id_1",
+            "name": "Testing Collection_1",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+            "updatedAt": "2025-05-07T08:34:57.000Z",
+            "createdAt": "2025-05-07T08:29:09.000Z",
+            "lastUpdatedBy": "34481324",
+            "uid": "collection_uid_1"
+        },
+        "item": [
+            {
+                "name": "Create Book",
+                "id": "95e61778-cafd-4093-8ee7-6ed9c28970ec",
+                "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                },
+                "request": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"title\": \"Fluent Python\",\n    \"author\": \"Luciano Ramalho\",\n    \"year\": 2021\n}",
+                        "options": {
+                            "raw": {
+                                "language": "json"
+                            }
+                        }
+                    },
+                    "url": {
+                        "raw": "{{base_url}}/api/v1/books/",
+                        "host": [
+                            "{{base_url}}"
+                        ],
+                        "path": [
+                            "api",
+                            "v1",
+                            "books",
+                            ""
+                        ]
+                    }
+                },
+                "response": [],
+                "uid": "34481324-95e61778-cafd-4093-8ee7-6ed9c28970ec"
+            },
+            {
+                "name": "Get Book",
+                "id": "71f72464-75de-4fa4-a8d0-4ad8c27c2df6",
+                "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                },
+                "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                        "raw": "{{base_url}}/api/v1/books/:pk/",
+                        "host": [
+                            "{{base_url}}"
+                        ],
+                        "path": [
+                            "api",
+                            "v1",
+                            "books",
+                            ":pk",
+                            ""
+                        ],
+                        "variable": [
+                            {
+                                "key": "pk",
+                                "value": ""
+                            }
+                        ]
+                    }
+                },
+                "response": [],
+                "uid": "34481324-71f72464-75de-4fa4-a8d0-4ad8c27c2df6"
+            },
+            {
+                "name": "Get books",
+                "id": "d79d5e82-236d-4952-85d1-4f332f9c119c",
+                "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                },
+                "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                        "raw": "{{base_url}}/api/v1/books/",
+                        "host": [
+                            "{{base_url}}"
+                        ],
+                        "path": [
+                            "api",
+                            "v1",
+                            "books",
+                            ""
+                        ]
+                    }
+                },
+                "response": [],
+                "uid": "34481324-d79d5e82-236d-4952-85d1-4f332f9c119c"
+            },
+            {
+                "name": "Update Book",
+                "id": "086b6492-b7bf-4bf9-97ef-dae08822f7ed",
+                "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                },
+                "request": {
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"title\": \"Fluent Python\",\n    \"author\": \"Luciano Ramalho\",\n    \"year\": 2022\n}",
+                        "options": {
+                            "raw": {
+                                "language": "json"
+                            }
+                        }
+                    },
+                    "url": {
+                        "raw": "{{base_url}}/api/v1/books/:pk/",
+                        "host": [
+                            "{{base_url}}"
+                        ],
+                        "path": [
+                            "api",
+                            "v1",
+                            "books",
+                            ":pk",
+                            ""
+                        ],
+                        "variable": [
+                            {
+                                "key": "pk",
+                                "value": ""
+                            }
+                        ]
+                    }
+                },
+                "response": [],
+                "uid": "34481324-086b6492-b7bf-4bf9-97ef-dae08822f7ed"
+            },
+            {
+                "name": "Delete Book",
+                "id": "6c105a9a-2ee2-4884-b22d-38cdac5d4905",
+                "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                },
+                "request": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                        "raw": "{{base_url}}/api/v1/books/:pk/",
+                        "host": [
+                            "{{base_url}}"
+                        ],
+                        "path": [
+                            "api",
+                            "v1",
+                            "books",
+                            ":pk",
+                            ""
+                        ],
+                        "variable": [
+                            {
+                                "key": "pk",
+                                "value": ""
+                            }
+                        ]
+                    }
+                },
+                "response": [],
+                "uid": "34481324-6c105a9a-2ee2-4884-b22d-38cdac5d4905"
+            }
+        ],
+        "event": [
+            {
+                "listen": "prerequest",
+                "script": {
+                    "id": "00837b85-a224-4b80-9b0c-69051c626946",
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                        ""
+                    ]
+                }
+            },
+            {
+                "listen": "test",
+                "script": {
+                    "id": "10d98c60-3c18-4e75-a059-90a98ab66542",
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                        ""
+                    ]
+                }
+            }
+        ],
+        "variable": [
+            {
+                "key": "base_url",
+                "value": "",
+                "type": "string"
+            }
+        ]
+    }
+}

@@ -148,32 +148,34 @@ async def get_collections_uids_by_names(names: Iterable[str]) -> list[str]:
 
 
 def archive_collections(
-    collections_path: Path, archive_type: enums.ArchiveType, archive_name: str
-) -> None:
+    collections_path: Path,
+    archive_name: str,
+    archive_type: enums.ArchiveType = enums.ArchiveType.ZIP,
+) -> str:
     """
     Create an archive from a directory containing Postman collections.
 
     Args:
         collections_path (Path): Path to the directory containing collection files.
-        archive_type (enums.ArchiveType): Type of archive to create (e.g., 'zip', 'tar').
-        archive_name (str): Full path and base name of the archive to be created
-            (excluding extension).
+        archive_type (enums.ArchiveType): Type of archive to create (e.g., 'zip', 'tar'). Default: zip.
+        archive_name (str): Full path and base name of the archive to be created (excluding extension).
 
     Raises:
         FileNotFoundError: If the collections directory is empty.
-        ArchiveCreateError: If an error occurs during archive creation
-            (e.g., invalid type, invalid path).
+        ArchiveCreateError: If an error occurs during archive creation.
+
+    Returns:
+        str: Full path to the created archive.
+            E.g `/home/user/Archives/Postman_archived_collections.zip`
     """
-    if not os.listdir(collections_path):
+    if not any(Path(collections_path).iterdir()):
         raise FileNotFoundError(
             f"No collection files found in directory '{collections_path}'."
         )
 
     try:
-        shutil.make_archive(
-            archive_name,
-            archive_type,
-            root_dir=collections_path,
+        return shutil.make_archive(
+            archive_name, archive_type, root_dir=collections_path
         )
     except (ValueError, NotADirectoryError) as e:
         raise exceptions.ArchiveCreateError(f"Failed to create archive: {e}.") from e

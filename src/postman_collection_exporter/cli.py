@@ -179,7 +179,7 @@ async def archive(
     "-p",
     type=CRONTAB_PATTERN,
     required=True,
-    help="Crontab pattern (e.g., * * * * *). Must be written within quotes!",
+    help='Crontab pattern (e.g., "0 0 * * *" for daily at midnight). Must be written within quotes!',
 )
 @click.option(
     "--comment",

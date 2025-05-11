@@ -49,3 +49,17 @@ class PostmanCollectionNotFoundError(PostmanAPIError):
 
 class ArchiveCreateError(RuntimeError):
     """Raised when archiving the Postman collections fails."""
+
+
+class CronScheduleExistsError(Exception):
+    """Raised when schedule is already exists in crontab."""
+
+    def __init__(self, pattern: str, comment: str, command: str) -> None:
+        self.pattern = pattern
+        self.comment = comment
+        self.command = command
+        super().__init__(
+            f"Crontab schedule is already exists for this pattern {pattern}. "
+            f"Cron comment: {comment}. Command: {command}."
+            "You can remove it with command 'cron.remove_all(time=<pattern>)'."
+        )

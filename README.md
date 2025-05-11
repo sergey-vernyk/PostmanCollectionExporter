@@ -4,6 +4,21 @@ Export your Postman collections via a simple CLI.
 
 ---
 
+# 📑 Table of Content
+
+  - [✨ Features](#-features)
+  - [🚀 Usage](#-usage)
+    - [Export Collections](#-export-collections)
+    - [Archive collections](#-archive-collections)
+    - [Scheduling CLI actions](#-scheduling-cli-actions)
+  - [⚙️ Requirements](#-requirements)
+  - [📑 Environment Variables](#-environment-variables)
+  - [🛠️ Project Structure](#-project-structure)
+  - [🧹 TODO](#-todo)
+  - [📜 License](#-license)
+  - [👤 Authors](#-authors)
+
+
 ## ✨ Features
 
 - **Export Multiple Collections**: Export several Postman collections simultaneously with just a few commands.
@@ -13,35 +28,53 @@ Export your Postman collections via a simple CLI.
 - **CLI Built with asyncclick Library**: A powerful and user-friendly command-line interface, built with `asyncclick` to handle async operations gracefully.
 - **Error Handling**: Gracefully handles errors from the Postman API, ensuring that authentication issues or rate limits are reported clearly.
 - **Modular and Extendable**: The app's modular structure makes it easy to add new features or adjust behavior as needed.
-
+- **Crontab Scheduling (Unix-based Systems)**: Automate exporting or archiving actions using crontab. This feature is only available on Unix-based systems and requires an additional dependency.
 ---
 
 ## 🚀 Usage
 
 ### Export Collections
 ```bash
-# Using directly (--api-key is optional if POSTMAN_API_KEY is set)
+# Using Python module
 python -m postman_collection_exporter.cli export --path /home/user/exports -n Collection1 -n Collection2 --api-key postman-api-key
 
-# Using CLI command (--api-key is optional if POSTMAN_API_KEY is set)
+# Using directly (--api-key is optional if POSTMAN_API_KEY is set)
 export-collections --path /home/user/exports -n Collection1 -n Collection2 --api-key postman-api-key
 ```
 - `-p, --path-to-collections`: Directory, where exported collections will be located.
 - `-n, --collection-names`: Names of the Postman collections to be export.
 - `-k, --api-key`: Optional Postman API key for authentication.  Overrides environment variable.
 
-### For archive collections
+### Archive collections
 ```bash
-# Using directly (--api-key is optional if POSTMAN_API_KEY is set)
+# Using Python module
 python -m postman_collection_exporter.cli archive --path-to-collections /home/user/exports --path-to-archive /home/user/archives -n My_Collections --archive-type tar
 
-# Using CLI command
+# Using directly (--api-key is optional if POSTMAN_API_KEY is set)
 archive-collections --path-to-collections /home/user/exports --path-to-archive /home/user/archives -n My_Collections --archive-type tar
 ```
 - `-c, --path-to-collections`: Path to directory with collections being archived.
 - `-a, --path-to-archive`: Path to directory with an archive being created.
 - `-n, --name`: Name of the archive being created.
-- `--archive-type`: Type of an archive being created.[default:zip]
+- `--archive-type`: Type of an archive being created. [default:zip]
+
+### Scheduling CLI actions
+In order to use scheduling functionality it's necessary to install the package with an extra dependency:
+```bash
+pip install postman_collection_exporter"[schedule]"
+```
+```bash
+# Using Python module
+python -m postman_collection_exporter.cli set-schedule --action export --pattern "1 * * * *" --comment "Export Postman collections every hour."
+
+# Using directly
+set-schedule --action export --pattern "1 * * * *" --comment "collection exporting"
+```
+- `-a, --action`: Choose the Postman action to schedule. (export or archive at this time) [required]
+- `-p, --pattern`: Crontab pattern (e.g., "0 0 * * *" for daily at midnight). Must be written within quotes! [required]
+- `-c, --comment`: Comment added to the crontab entry (displayed next to the pattern) [required]
+- `-u, --user`: Username for the target crontab (default: current user). Assigning dynamically.
+- `--dry-run`: Show the crontab entry that would be created, without applying it.
 ---
 
 ## ⚙️ Requirements
@@ -50,7 +83,7 @@ archive-collections --path-to-collections /home/user/exports --path-to-archive /
 
 ## 📑 Environment Variables
 
-Export API key into terminal via command (optional):
+Set the Postman API key as an environment variable (optional):
 
 ```bash
 export POSTMAN_API_KEY=<actual_api_key>
@@ -68,22 +101,34 @@ The script will fail gracefully if no API key is found.
 ├── pyproject.toml
 ├── README.md
 ├── requirements.txt
-└── src
-    └── postman_collection_exporter
-        ├── cli.py
-        ├── enums.py
-        ├── exceptions.py
-        ├── exporters.py
-        ├── helpers.py
-        └── __init__.py
+├── src
+│   ├── __init__.py
+│   └── postman_collection_exporter
+│       ├── cli.py
+│       ├── cli_utils.py
+│       ├── enums.py
+│       ├── exceptions.py
+│       ├── exporters.py
+│       ├── helpers.py
+│       ├── __init__.py
+│       └── structures.py
+└── tests
+    ├── fixtures
+    │   ├── test_data_collection_1.json
+    │   └── test_data_collection_2.json
+    ├── __init__.py
+    ├── mocks.py
+    └── test_helpers.py
 ```
 ---
 
 ## 🧹 TODO
 
-- [ ] Add unit tests
+- [x] Add unit tests for archiving
+- [x] Add unit tests for exporting
+- [ ] Add unit tests for scheduling
 - [ ] Add GitHub Actions CI
-- [ ] Improve logging
+- [ ] Add logging
 
 ---
 

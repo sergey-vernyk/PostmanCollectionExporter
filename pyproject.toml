@@ -8,23 +8,23 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
-keywords = ["postman", "json", "export", "cli"]
+keywords = ["postman", "json", "export", "cli", "crontab"]
 
 dependencies = ["asyncclick", "httpx", "anyio", "aiofiles"]
 
 [project.optional-dependencies]
 test = ["pytest", "trio", "pytest-asyncio"]
+schedule = ["python-crontab"]
 
 [tool.pytest.ini_options]
-testpaths = [
-    "tests/",
-]
+testpaths = ["tests/"]
 asyncio_default_fixture_loop_scope = "function"
 asyncio_mode = "auto"
 
 [project.scripts]
 export-collections = "postman_collection_exporter.cli:export"
 archive-collections = "postman_collection_exporter.cli:archive"
+set-schedule = "postman_collection_exporter.cli:set_schedule"
 
 [build-system]
 requires = ["hatchling >= 1.26"]

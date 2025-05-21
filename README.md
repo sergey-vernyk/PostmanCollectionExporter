@@ -59,16 +59,19 @@ archive-collections --path-to-collections /home/user/exports --path-to-archive /
 - `--archive-type`: Type of an archive being created. [default:zip]
 
 ### Scheduling CLI actions
-In order to use scheduling functionality it's necessary to install the package with an extra dependency:
+In order to use scheduling functionality **it's necessary to install** the package with an extra dependency:
 ```bash
 pip install postman_collection_exporter"[schedule]"
+
+# or install needed package later via
+pip install python-crontab
 ```
 ```bash
 # Using Python module
 python -m postman_collection_exporter.cli set-schedule --action export --pattern "1 * * * *" --comment "Export Postman collections every hour."
 
 # Using directly
-set-schedule --action export --pattern "1 * * * *" --comment "collection exporting"
+set-schedule --action export --pattern "1 * * * *" --comment "Export Postman collections every hour."
 ```
 - `-a, --action`: Choose the Postman action to schedule. (export or archive at this time) [required]
 - `-p, --pattern`: Crontab pattern (e.g., "0 0 * * *" for daily at midnight). Must be written within quotes! [required]
@@ -102,20 +105,26 @@ The script will fail gracefully if no API key is found.
 ├── README.md
 ├── requirements.txt
 ├── src
-│   ├── __init__.py
-│   └── postman_collection_exporter
-│       ├── cli.py
-│       ├── cli_utils.py
-│       ├── enums.py
-│       ├── exceptions.py
-│       ├── exporters.py
-│       ├── helpers.py
-│       ├── __init__.py
-│       └── structures.py
+│   └── postman_collection_exporter
+│       ├── cli.py
+│       ├── dependencies
+│       │   ├── __init__.py
+│       │   └── utils.py
+│       ├── enums.py
+│       ├── exceptions.py
+│       ├── exporters.py
+│       ├── helpers.py
+│       ├── __init__.py
+│       ├── scheduling
+│       │   ├── cli.py
+│       │   ├── crontab_helpers.py
+│       │   ├── __init__.py
+│       │   └── utils.py
+│       └── structures.py
 └── tests
     ├── fixtures
-    │   ├── test_data_collection_1.json
-    │   └── test_data_collection_2.json
+    │   ├── test_data_collection_1.json
+    │   └── test_data_collection_2.json
     ├── __init__.py
     ├── mocks.py
     └── test_helpers.py

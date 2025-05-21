@@ -3,7 +3,8 @@ from pathlib import Path
 from typing import Any
 
 import asyncclick as click
-import crontab
+
+from ..dependencies.utils import ensure_crontab_is_installed
 
 
 def compose_cron_command(command_name: str, params: list[str]) -> str:
@@ -22,16 +23,16 @@ class CrontabParamType(click.ParamType):
     name = "crontab"
 
     def convert(
-        self,
-        value: Any,
-        param: click.Parameter | None,
-        ctx: click.Context | None,
-    ) -> str | None:
-        try:
-            if isinstance(value, str) and crontab.CronSlices.is_valid(value):
-                return value
-        except ValueError:
-            self.fail(f"{value!r} is not a valid crontab pattern.", param, ctx)
+        self, value: str, param: click.Parameter | None, ctx: click.Context | None
+    ) -> str:
+        # pylint: disable=import-outside-toplevel
+        ensure_crontab_is_installed()
+        import crontab
+
+        if crontab.CronSlices.is_valid(value):
+            return value
+
+        self.fail(f"{value!r} is not a valid crontab pattern.", param, ctx)
 
 
 CRONTAB_PATTERN = CrontabParamType()

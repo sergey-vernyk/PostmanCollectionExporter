@@ -25,6 +25,7 @@ asyncio_mode = "auto"
 export-collections = "postman_collection_exporter.cli:export"
 archive-collections = "postman_collection_exporter.cli:archive"
 set-schedule = "postman_collection_exporter.scheduling.cli:set_schedule"
+get-schedules = "postman_collection_exporter.scheduling.cli:get_schedules"
 
 [build-system]
 requires = ["hatchling >= 1.26"]

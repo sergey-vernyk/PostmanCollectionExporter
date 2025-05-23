@@ -1,17 +1,15 @@
 import sys
 from pathlib import Path
-from typing import Any
 
 import asyncclick as click
 
 from ..dependencies.utils import ensure_crontab_is_installed
 
 
-def compose_cron_command(command_name: str, params: list[str]) -> str:
+def compose_cron_command(command_name: str, params: list[str], module_name: str) -> str:
     """Composes and returns command for inserting it into crontab file."""
     py_exec_path = Path(sys.executable)
-    module_exec_path = __name__
-    return f"{py_exec_path} -m {module_exec_path} {command_name} {' '.join(params)}"
+    return f"{py_exec_path} -m {module_name} {command_name} {' '.join(params)}"
 
 
 class CrontabParamType(click.ParamType):

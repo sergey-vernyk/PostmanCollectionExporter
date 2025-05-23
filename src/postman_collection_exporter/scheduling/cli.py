@@ -1,4 +1,5 @@
 import getpass
+import inspect
 import sys
 from typing import Literal
 
@@ -18,7 +19,7 @@ from .utils import CRONTAB_PATTERN, compose_cron_command
     "-a",
     type=click.Choice(["export", "archive"], case_sensitive=False),
     required=True,
-    help="Choose the Postman action to schedule.",
+    help="The Postman action to schedule.",
 )
 @click.option(
     "--pattern",
@@ -63,7 +64,7 @@ def set_schedule(
 
     Args:
         action (Literal["export", "archive"]): The action to schedule.
-        pattern (str): A valid crontab pattern (e.g., "* * * * *").
+        pattern (str): Crontab pattern specifying the schedule (e.g., "* * * * *").
         comment (str): A comment to identify the schedule in crontab.
         user (str | bool): The user whose crontab will be modified.
         dry_run (bool, optional): If True, shows the generated crontab entry
@@ -79,9 +80,11 @@ def set_schedule(
     from ..cli import archive, export
 
     action_to_command: dict[str, click.Command] = {"export": export, "archive": archive}
+    hide_input_params = {"api_key"}
 
     if not click.confirm(
-        f"Please, fill out params to schedule for the <{action}> command. Continue?"
+        f"Please, fill out params to schedule for the <{action}> command. Continue?",
+        default=True,
     ):
         click.secho("Operation cancelled.", fg="yellow")
         return
@@ -104,17 +107,29 @@ def set_schedule(
                     break
         else:
             value: str = (
-                click.prompt(f"==> {param_name} (required)")
+                click.prompt(
+                    f"==> {param_name} (required)",
+                )
                 if param.required
-                else click.prompt(f"==> {param_name}", default=param.default or "")
+                else click.prompt(
+                    f"==> {param_name}",
+                    default=param.default or "",
+                    hide_input=param.name in hide_input_params,
+                )
             )
             if value.strip():
                 params.append(f"--{param_name}={value}")
 
-    cron_command = compose_cron_command(selected_command.name, params)
+    cron_command = compose_cron_command(
+        selected_command.name,
+        params,
+        inspect.getmodule(selected_command.callback).__name__,
+    )
+
     cron_data = structures.CrontabData(
         command=cron_command, comment=comment, user=user, pattern=pattern
     )
+
     try:
         if not dry_run:
             result = crontab_helpers.set_cron_schedule(cron_data)
@@ -134,3 +149,73 @@ def set_schedule(
         sys.exit(1)
     else:
         click.secho(result, fg="green")
+
+
+@click.command(help="Display scheduled Postman actions from the user's crontab.")
+@click.option(
+    "--all",
+    "-a",
+    "show_all",
+    is_flag=True,
+    help="Show all available crontab schedules, ignoring pattern and user filters.",
+)
+@click.option(
+    "--pattern",
+    "-p",
+    type=CRONTAB_PATTERN,
+    required=False,
+    help='Filter schedules by crontab pattern (e.g., "0 0 * * *" for daily at midnight).',
+)
+@click.option(
+    "--user",
+    "-u",
+    type=click.STRING,
+    required=False,
+    default=lambda: getpass.getuser(),  # pylint: disable=unnecessary-lambda
+    show_default=True,
+    help="Username for the target crontab (default: current user).",
+)
+def get_schedules(
+    pattern: str | None, user: str | bool, show_all: bool = False
+) -> None:
+    """
+    Display scheduled Postman actions from the user's crontab.
+
+    Retrieves and displays crontab entries related to Postman actions.
+    You can filter the results by crontab pattern and user, or show all available schedules.
+
+    Args:
+        pattern (str | None): Optional. Crontab pattern string to filter jobs by schedule.
+        user (str | bool): Optional. Username to filter jobs by owner. Defaults to the current user.
+        show_all (bool, optional): If True, displays all available cron jobs regardless of pattern or user.
+
+    Raises:
+        RuntimeError: If the 'python-crontab' package is not installed.
+        OSError: If the function is called on a Windows system where cron is not available.
+        ValueError: If a provided cron pattern is invalid.
+    """
+    ensure_crontab_is_installed()
+    count = 0
+    try:
+        # TODO: add LastRun info into the output
+        for job in crontab_helpers.get_cron_schedules(pattern, user, show_all):
+            if not click.confirm(
+                f"\nCommand: {job.command}"
+                f"\nComment: {job.comment}"
+                f"\nUser: {job.user}"
+                "\n\nGet next?",
+                default=True,
+            ):
+                click.secho("Operation cancelled.", fg="yellow")
+                break
+
+            count += 1
+            click.secho(
+                f"Displayed {count} crontab schedule{'s' if count != 1 else ''}."
+            )
+    except ValueError as e:
+        click.secho(str(e), err=True, fg="red")
+        sys.exit(1)
+    else:
+        if not count:
+            click.secho("The are no crontab schedules to display.", fg="yellow")

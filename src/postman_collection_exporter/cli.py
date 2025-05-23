@@ -5,6 +5,7 @@ This module provides a command-line interface (CLI) for interacting with Postman
 It includes commands for exporting collections, archiving them.
 """
 
+import logging
 import os
 import sys
 from datetime import datetime
@@ -14,7 +15,10 @@ import anyio
 import asyncclick as click
 
 from . import enums, exceptions, exporters, helpers
-from .scheduling.cli import set_schedule
+from .logging.config import setup_cli_logging
+from .scheduling.cli import get_schedules, set_schedule
+
+logger = logging.getLogger("main_cli")
 
 
 @click.group(help="CLI entry point providing commands for Postman collections.")
@@ -46,6 +50,16 @@ def cli() -> None:
     type=click.STRING,
     help="Optional Postman API key for authentication. Overrides environment variable.",
 )
+@click.option(
+    "--log-path",
+    "-l",
+    type=click.Path(exists=False, file_okay=True, dir_okay=False),
+    required=False,
+    show_default=True,
+    default=Path.home() / "crontab" / "cron.log",
+    help="Path to the log file for the command output.",
+)
+@setup_cli_logging(logging.INFO)
 async def export(
     path: str, collection_names: tuple[str, ...], api_key: str | None = None
 ) -> None:
@@ -80,16 +94,24 @@ async def export(
         exceptions.PostmanAPIError,
         exceptions.EnvironmentVariableMissingError,
     ) as e:
+        logger.error(
+            "Error was occurred during collections [%s] exporting: %s",
+            ", ".join(collection_names),
+            str(e),
+        )
         click.secho(str(e), fg="red", err=True)
         sys.exit(1)
 
+    logger.info(
+        "Collections [%s] have been exported successfully.",
+        ", ".join(collection_names),
+    )
     click.secho(
-        f"Collections ({', '.join(collection_names)}) have been exported successfully.",
+        f"Collections [{', '.join(collection_names)}] have been exported successfully.",
         fg="green",
     )
 
 
-# TODO add properly handling collection names with spaces
 @click.command(
     help="Archive a directory containing Postman collections into an archive file."
 )
@@ -125,6 +147,16 @@ async def export(
     ),
     help="Type of archive being created.",
 )
+@click.option(
+    "--log-path",
+    "-l",
+    type=click.Path(exists=False, file_okay=True, dir_okay=False),
+    required=False,
+    show_default=True,
+    default=Path.home() / "crontab" / "cron.log",
+    help="Path to the log file for the command output.",
+)
+@setup_cli_logging(logging.INFO)
 async def archive(
     path_to_collections: str,
     path_to_archive: str,
@@ -155,8 +187,15 @@ async def archive(
         helpers.archive_collections(_collections_path, str(archive_name), archive_type)
     except (exceptions.ArchiveCreateError, FileNotFoundError) as e:
         click.secho(str(e), fg="red", err=True)
+        logger.error("Error was occurred during collections archiving: %s.", str(e))
         sys.exit(1)
 
+    logger.info(
+        "Collections have been archived successfully to file '%s.%s' in '%s' directory.",
+        archive_name.stem,
+        archive_type,
+        _archive_path,
+    )
     click.secho(
         f"Archive '{archive_name.stem}.{archive_type}' has been created in '{_archive_path}' directory.",
         fg="green",
@@ -166,6 +205,7 @@ async def archive(
 cli.add_command(export)
 cli.add_command(archive)
 cli.add_command(set_schedule)
+cli.add_command(get_schedules)
 
 if __name__ == "__main__":
     anyio.run(cli.main)

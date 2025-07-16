@@ -29,6 +29,7 @@ Export your Postman collections via a simple CLI.
 - **Error Handling**: Gracefully handles errors from the Postman API, ensuring that authentication issues or rate limits are reported clearly.
 - **Modular and Extendable**: The app's modular structure makes it easy to add new features or adjust behavior as needed.
 - **Crontab Scheduling (Unix-based Systems)**: Automate exporting or archiving actions using crontab. This feature is only available on Unix-based systems and requires an additional dependency.
+- **Logging**: Logs CLI command results and errors to a user-specified log file (via the `--log-path` option).  
 ---
 
 ## 🚀 Usage
@@ -44,6 +45,7 @@ export-collections --path /home/user/exports -n Collection1 -n Collection2 --api
 - `-p, --path-to-collections`: Directory, where exported collections will be located.
 - `-n, --collection-names`: Names of the Postman collections to be export.
 - `-k, --api-key`: Optional Postman API key for authentication.  Overrides environment variable.
+- `-l, --log-path`: Path to the log file for the command output. [default: /home/username/crontab/cron.log]
 
 ### Archive collections
 ```bash
@@ -57,6 +59,7 @@ archive-collections --path-to-collections /home/user/exports --path-to-archive /
 - `-a, --path-to-archive`: Path to directory with an archive being created.
 - `-n, --name`: Name of the archive being created.
 - `--archive-type`: Type of an archive being created. [default:zip]
+- `-l, --log-path`: Path to the log file for the command output. [default: /home/username/crontab/cron.log]
 
 ### Scheduling CLI actions
 In order to use scheduling functionality **it's necessary to install** the package with an extra dependency:
@@ -115,6 +118,9 @@ The script will fail gracefully if no API key is found.
 │       ├── exporters.py
 │       ├── helpers.py
 │       ├── __init__.py
+│       ├── logging
+│       │   ├── config.py
+│       │   └── __init__.py
 │       ├── scheduling
 │       │   ├── cli.py
 │       │   ├── crontab_helpers.py
@@ -135,6 +141,8 @@ The script will fail gracefully if no API key is found.
 
 - [x] Add unit tests for archiving
 - [x] Add unit tests for exporting
+- [x] Add logging to CLI command
+- [ ] Add logging to helpers functions
 - [ ] Add unit tests for scheduling
 - [ ] Add GitHub Actions CI
 - [ ] Add logging

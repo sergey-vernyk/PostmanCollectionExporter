@@ -1,5 +1,11 @@
+from collections.abc import Generator
+from typing import TYPE_CHECKING
+
 from .. import exceptions, structures
 from ..dependencies.utils import ensure_crontab_is_installed
+
+if TYPE_CHECKING:
+    import crontab
 
 
 def set_cron_schedule(cron_data: structures.CrontabData) -> str:
@@ -52,7 +58,6 @@ def set_cron_schedule(cron_data: structures.CrontabData) -> str:
         raise exceptions.CronScheduleExistsError(
             cron_data.pattern, job.comment, job.command or "No command."
         )
-
     job = cron.new(cron_data.command, cron_data.comment)
     job.setall(cron_data.pattern)
     job.enable()
@@ -69,3 +74,55 @@ def set_cron_schedule(cron_data: structures.CrontabData) -> str:
         f"Comment  ==> {cron_data.comment}\n"
         f"User     ==> {cron_data.user}\n"
     )
+
+
+def get_cron_schedules(
+    pattern: str | None, user: str | None, show_all: bool = False
+) -> Generator["crontab.CronItem", None, None]:
+    """
+    Retrieve cron schedule entries based on a pattern, user, or all available jobs.
+
+    Args:
+        pattern (str | None): A cron pattern string to filter jobs by schedule.
+        user (str | None): The username to filter jobs by owner.
+        show_all (bool, optional): If True, yields all available cron jobs regardless of pattern or user.
+            Defaults to False.
+
+    Yields:
+        crontab.CronItem: Cron job entries matching the specified criteria.
+
+    Raises:
+        OSError: If the function is called on a Windows system where cron is not available.
+        ValueError: If a provided cron pattern is invalid.
+
+    Note:
+        - Requires the 'crontab' and 'crontabs' Python packages.
+        - Only one of 'pattern', 'user', or 'show_all' should be used at a time for meaningful results.
+    """
+    # pylint: disable=import-outside-toplevel
+
+    ensure_crontab_is_installed()
+
+    import platform
+
+    import crontab
+    import crontabs
+
+    if platform.system() == "Windows":
+        raise OSError(
+            "Cron scheduling isn't available on Windows. Consider using Task Scheduler."
+        )
+
+    if show_all:
+        yield from crontabs.CronTabs().all
+
+    elif pattern is not None:
+        if not crontab.CronSlices.is_valid():
+            raise ValueError(f"Cron pattern [{pattern}] isn't valid.")
+
+        yield from crontabs.CronTabs().all.find_time(pattern)
+
+    elif user is not None:
+        for job in crontabs.CronTabs().all:
+            if user == job.user:
+                yield job

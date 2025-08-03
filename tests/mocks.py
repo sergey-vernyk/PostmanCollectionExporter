@@ -187,3 +187,8 @@ async def mock_get_collections_content(
         json_content = json.loads(await fp.read())
 
     return httpx.Response(status_code=200, json=json_content, request=request)
+
+
+def mock_module_import(name: str, *args: Any, **kwargs: Any) -> None:
+    if name == "crontab":
+        raise ImportError(f"No module named '{name}'")

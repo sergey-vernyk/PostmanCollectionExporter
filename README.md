@@ -133,6 +133,7 @@ The script will fail gracefully if no API key is found.
     │   └── test_data_collection_2.json
     ├── __init__.py
     ├── mocks.py
+    ├── test_crontab_helpers.py
     └── test_helpers.py
 ```
 ---
@@ -143,7 +144,7 @@ The script will fail gracefully if no API key is found.
 - [x] Add unit tests for exporting
 - [x] Add logging to CLI command
 - [ ] Add logging to helpers functions
-- [ ] Add unit tests for scheduling
+- [x] Add unit tests for scheduling
 - [ ] Add GitHub Actions CI
 - [ ] Add logging
 

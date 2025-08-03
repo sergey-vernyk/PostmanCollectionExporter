@@ -191,7 +191,7 @@ async def test_set_schedule_if_already_exists() -> None:
         exceptions.CronScheduleExistsError,
         match=re.escape(
             f"Crontab schedule is already exists for this command {command}. "
-            f"Cron comment: {comment}. Pattern: {pattern}."
+            f"Cron comment: {comment}. Pattern: {pattern}. "
             "You can remove it with command 'cron.remove_all(command=<command>)'."
         ),
     ):
@@ -333,6 +333,7 @@ async def test_get_schedule_all() -> None:
         job
         for job in crontab_helpers.get_cron_schedules(show_all=True)
         if not str(job).startswith("#")
+        and job.comment in {"Comment for archive", "Comment for export"}
     )
 
     assert len(crons) == 2

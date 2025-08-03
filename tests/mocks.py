@@ -1,3 +1,4 @@
+import builtins
 import json
 from pathlib import Path
 from typing import Any, Callable, Coroutine
@@ -8,6 +9,8 @@ import httpx
 # pylint: disable=missing-function-docstring
 
 fixtures_path = Path(__file__).parent / "fixtures"
+
+real_import = builtins.__import__
 
 
 async def mock_get_uids_by_names(
@@ -187,3 +190,10 @@ async def mock_get_collections_content(
         json_content = json.loads(await fp.read())
 
     return httpx.Response(status_code=200, json=json_content, request=request)
+
+
+def mock_module_import(name: str, *args: Any, **kwargs: Any) -> None:
+    if name == "crontab":
+        raise ImportError(f"No module named '{name}'")
+
+    return real_import(name, *args, **kwargs)

@@ -33,7 +33,7 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest pytest-asyncio trio
+        pip install pytest pytest-asyncio trio python-crontab
 
     - name: Run Tests
       run: pytest

@@ -190,9 +190,9 @@ async def test_set_schedule_if_already_exists() -> None:
     with pytest.raises(
         exceptions.CronScheduleExistsError,
         match=re.escape(
-            f"Crontab schedule is already exists for this pattern {pattern}. "
-            f"Cron comment: {comment}. Command: {command}."
-            "You can remove it with command 'cron.remove_all(time=<pattern>)'."
+            f"Crontab schedule is already exists for this command {command}. "
+            f"Cron comment: {comment}. Pattern: {pattern}."
+            "You can remove it with command 'cron.remove_all(command=<command>)'."
         ),
     ):
         crontab_data = structures.CrontabData(

@@ -59,7 +59,7 @@ class CronScheduleExistsError(Exception):
         self.comment = comment
         self.command = command
         super().__init__(
-            f"Crontab schedule is already exists for this pattern {pattern}. "
-            f"Cron comment: {comment}. Command: {command}."
-            "You can remove it with command 'cron.remove_all(time=<pattern>)'."
+            f"Crontab schedule is already exists for this command {command}. "
+            f"Cron comment: {comment}. Pattern: {pattern}."
+            "You can remove it with command 'cron.remove_all(command=<command>)'."
         )

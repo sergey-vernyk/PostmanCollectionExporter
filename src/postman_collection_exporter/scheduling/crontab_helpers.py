@@ -54,11 +54,15 @@ def set_cron_schedule(cron_data: structures.CrontabData) -> str:
 
     cron = crontab.CronTab(user=cron_data.user)
 
-    for job in cron.find_time(cron_data.pattern):
+    for job in cron.find_command(cron_data.command):
         raise exceptions.CronScheduleExistsError(
             cron_data.pattern, job.comment, job.command or "No command."
         )
-    job = cron.new(cron_data.command, cron_data.comment)
+    job = cron.new(
+        cron_data.command,
+        cron_data.comment,
+        user=cron_data.user if isinstance(cron_data.user, str) else None,
+    )
     job.setall(cron_data.pattern)
     job.enable()
 
@@ -77,14 +81,14 @@ def set_cron_schedule(cron_data: structures.CrontabData) -> str:
 
 
 def get_cron_schedules(
-    pattern: str | None, user: str | None, show_all: bool = False
+    pattern: str | None = None, user: str | None = None, show_all: bool = False
 ) -> Generator["crontab.CronItem", None, None]:
     """
     Retrieve cron schedule entries based on a pattern, user, or all available jobs.
 
     Args:
-        pattern (str | None): A cron pattern string to filter jobs by schedule.
-        user (str | None): The username to filter jobs by owner.
+        pattern (str | None, optional): A cron pattern string to filter jobs by schedule. Defaults to None.
+        user (str | None, optional): The username to filter jobs by owner. Defaults to None.
         show_all (bool, optional): If True, yields all available cron jobs regardless of pattern or user.
             Defaults to False.
 
@@ -117,7 +121,7 @@ def get_cron_schedules(
         yield from crontabs.CronTabs().all
 
     elif pattern is not None:
-        if not crontab.CronSlices.is_valid():
+        if not crontab.CronSlices.is_valid(pattern):
             raise ValueError(f"Cron pattern [{pattern}] isn't valid.")
 
         yield from crontabs.CronTabs().all.find_time(pattern)

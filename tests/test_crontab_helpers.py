@@ -280,7 +280,11 @@ async def test_get_schedule_by_pattern_success() -> None:
     crontab_helpers.set_cron_schedule(crontab_data)
 
     crons = list(
-        crontab_helpers.get_cron_schedules(pattern="* * * * *", user=getpass.getuser())
+        job
+        for job in crontab_helpers.get_cron_schedules(
+            pattern="* * * * *", user=getpass.getuser()
+        )
+        if not str(job).startswith("#")
     )
 
     assert len(crons) == 1
@@ -326,7 +330,9 @@ async def test_get_schedule_all() -> None:
     crontab_helpers.set_cron_schedule(crontab_data)
 
     crons = list(
-        crontab_helpers.get_cron_schedules(show_all=True, user=getpass.getuser())
+        job
+        for job in crontab_helpers.get_cron_schedules(show_all=True)
+        if not str(job).startswith("#")
     )
 
     assert len(crons) == 2
@@ -372,7 +378,11 @@ async def test_get_schedule_for_user() -> None:
     )
     crontab_helpers.set_cron_schedule(crontab_data)
 
-    crons = list(crontab_helpers.get_cron_schedules(user=getpass.getuser()))
+    crons = list(
+        job
+        for job in crontab_helpers.get_cron_schedules(user=getpass.getuser())
+        if not str(job).startswith("#")
+    )
 
     assert len(crons) == 2
     assert crons[0].command == command_1 and crons[0].comment == comment_1

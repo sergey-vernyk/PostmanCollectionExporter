@@ -112,7 +112,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       # from PyPi Trusted Publisher Management
-      name: testing-release
+      name: release
     permissions:
       # in order to use Trusted Publisher
       id-token: write
@@ -127,25 +127,25 @@ jobs:
 
       - name: Publish Distribution To PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        # with:
+        #   repository-url: ${{ vars.PYPI_BASE_URL }}/legacy/
+
+  github_release:
+    name: Create GitHub Release
+    needs: [setup_and_build, details]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
         with:
-          repository-url: ${{ vars.PYPI_BASE_URL }}/legacy/
+          name: dist
+          path: dist/
 
-  # github_release:
-  #   name: Create GitHub Release
-  #   needs: [setup_and_build, details]
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: write
-  #   steps:
-  #     - name: Download Artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: dist
-  #         path: dist/
-
-  #     - name: Create GitHub Release
-  #       id: create_release
-  #       env:
-  #         GITHUB_TOKEN: ${{ github.token }}
-  #       run: |
-  #         gh release create ${{ needs.details.outputs.tag_name }} dist/* --title ${{ needs.details.outputs.tag_name }} --generate-notes
+      - name: Create GitHub Release
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release create ${{ needs.details.outputs.tag_name }} dist/* --title ${{ needs.details.outputs.tag_name }} --generate-notes

@@ -42,7 +42,7 @@ jobs:
       - name: Get Name Of Package
         id: package_information
         run: |
-          pip install hatchling
+          pip install hatchling hatch-vcs
 
           PACKAGE_NAME=$(hatchling metadata name)
           echo "Package name: $PACKAGE_NAME"

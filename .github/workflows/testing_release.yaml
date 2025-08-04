@@ -95,6 +95,7 @@ jobs:
 
       - name: Build Source And Wheel Distribution
         run: |
+          python3 -m pip install --upgrade build
           python3 -m build
 
       - name: Upload Artifacts

@@ -1,6 +1,6 @@
 [project]
 name = "postman-collection-exporter"
-version = "0.1.2dev2"
+dynamic = ["version"]
 description = "Export Postman collections via CLI."
 authors = [{ name = "Sergey Vernigora", email = "volt.awp.dev@gmail.com" }]
 maintainers = [{ name = "Sergey Vernigora", email = "volt.awp.dev@gmail.com" }]
@@ -28,5 +28,8 @@ set-schedule = "postman_collection_exporter.scheduling.cli:set_schedule"
 get-schedules = "postman_collection_exporter.scheduling.cli:get_schedules"
 
 [build-system]
-requires = ["hatchling >= 1.26"]
+requires = ["hatchling >= 1.26", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"

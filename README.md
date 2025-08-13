@@ -98,10 +98,10 @@ Set the Postman API key as an environment variable (optional):
 ```bash
 $ export POSTMAN_API_KEY=<actual_api_key>
 ```
-The script will fail gracefully if no API key is found.
 
 ### Note: 
 Exporting `POSTMAN_API_KEY` will have an effect only with manual exporting collection(s). In order to schedule exporting collections it's necessary to pass API key via `api-key` option like below:
+
 ```bash
 $ set-schedule --action export --comment "comment" --pattern "* * * * *"
 
@@ -113,7 +113,31 @@ Any other value for 'collection-names'? [y/N]: N
 # other prompts
 ```
 ---
+### Scheduling CLI actions
 
+```bash
+# Using Python module
+$ python -m postman_collection_exporter.cli set-schedule --action export --pattern "1 * * * *" --comment "Export Postman collections every hour."
+
+# Using directly
+$ set-schedule --action export --pattern "1 * * * *" --comment "Export Postman collections every hour."
+```
+- `-a, --action`: Choose the Postman action to schedule. (export or archive at this time) [required]
+- `-p, --pattern`: Crontab pattern (e.g., "0 0 * * *" for daily at midnight). Must be written within quotes! [required]
+- `-c, --comment`: Comment added to the crontab entry (displayed next to the pattern) [required]
+- `-u, --user`: Username for the target crontab (default: current user). Assigning dynamically.
+- `--dry-run`: Show the crontab entry that would be created, without applying it.
+
+```bash
+# Using Python module
+$ python -m postman_collection_exporter.cli get-schedules --all
+
+# Using directly
+$ get-schedules --all
+```
+- `-a, --all`: Show all available crontab schedules, ignoring pattern and user filters.
+- `-p, --pattern`: Filter schedules by crontab pattern (e.g., "0 0 * * *" for daily at midnight). 
+- `-u, --user`: Username for the target crontab (default: current user). Assigning dynamically.
 ## Project Structure
 
 ```

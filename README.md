@@ -6,17 +6,18 @@ Export your Postman collections via a simple CLI
 
 # Table of Content
 
-  - [✨ Features](#-features)
-  - [🚀 Usage](#-usage)
-    - [Export Collections](#-export-collections)
-    - [Archive collections](#-archive-collections)
-    - [Scheduling CLI actions](#-scheduling-cli-actions)
-  - [⚙️ Requirements](#-requirements)
-  - [📑 Environment Variables](#-environment-variables)
-  - [🛠️ Project Structure](#-project-structure)
-  - [🧹 TODO](#-todo)
-  - [📜 License](#-license)
-  - [👤 Authors](#-authors)
+  - [Features](#features)
+  - [Usage](#usage)
+    - [Installation](#installation)
+    - [Export Collections](#export-collections)
+    - [Archive collections](#archive-collections)
+    - [Scheduling CLI actions](#scheduling-cli-actions)
+  - [Requirements](#requirements)
+  - [Environment Variables](#environment-variables)
+  - [Project Structure](#project-structure)
+  - [Contributing](#contributing)
+  - [TODO](#todo)
+  - [License](#license)
 
 
 ## Features
@@ -87,6 +88,32 @@ $ set-schedule --action export --pattern "1 * * * *" --comment "Export Postman c
 - `--dry-run`: Show the crontab entry that would be created, without applying it.
 ---
 
+### Scheduling CLI actions
+
+```bash
+# Using Python module
+$ python -m postman_collection_exporter.cli set-schedule --action export --pattern "1 * * * *" --comment "Export Postman collections every hour."
+
+# Using directly
+$ set-schedule --action export --pattern "1 * * * *" --comment "Export Postman collections every hour."
+```
+- `-a, --action`: Choose the Postman action to schedule. (export or archive at this time) [required]
+- `-p, --pattern`: Crontab pattern (e.g., "0 0 * * *" for daily at midnight). Must be written within quotes! [required]
+- `-c, --comment`: Comment added to the crontab entry (displayed next to the pattern) [required]
+- `-u, --user`: Username for the target crontab (default: current user). Assigning dynamically.
+- `--dry-run`: Show the crontab entry that would be created, without applying it.
+
+```bash
+# Using Python module
+$ python -m postman_collection_exporter.cli get-schedules --all
+
+# Using directly
+$ get-schedules --all
+```
+- `-a, --all`: Show all available crontab schedules, ignoring pattern and user filters.
+- `-p, --pattern`: Filter schedules by crontab pattern (e.g., "0 0 * * *" for daily at midnight). 
+- `-u, --user`: Username for the target crontab (default: current user). Assigning dynamically.
+
 ## Requirements
 
 - Python 3.11+
@@ -113,31 +140,6 @@ Any other value for 'collection-names'? [y/N]: N
 # other prompts
 ```
 ---
-### Scheduling CLI actions
-
-```bash
-# Using Python module
-$ python -m postman_collection_exporter.cli set-schedule --action export --pattern "1 * * * *" --comment "Export Postman collections every hour."
-
-# Using directly
-$ set-schedule --action export --pattern "1 * * * *" --comment "Export Postman collections every hour."
-```
-- `-a, --action`: Choose the Postman action to schedule. (export or archive at this time) [required]
-- `-p, --pattern`: Crontab pattern (e.g., "0 0 * * *" for daily at midnight). Must be written within quotes! [required]
-- `-c, --comment`: Comment added to the crontab entry (displayed next to the pattern) [required]
-- `-u, --user`: Username for the target crontab (default: current user). Assigning dynamically.
-- `--dry-run`: Show the crontab entry that would be created, without applying it.
-
-```bash
-# Using Python module
-$ python -m postman_collection_exporter.cli get-schedules --all
-
-# Using directly
-$ get-schedules --all
-```
-- `-a, --all`: Show all available crontab schedules, ignoring pattern and user filters.
-- `-p, --pattern`: Filter schedules by crontab pattern (e.g., "0 0 * * *" for daily at midnight). 
-- `-u, --user`: Username for the target crontab (default: current user). Assigning dynamically.
 ## Project Structure
 
 ```
@@ -211,7 +213,7 @@ We appreciate all contributions and will review pull requests as quickly as poss
 - [x] Add logging to CLI command
 - [ ] Add logging to helpers functions
 - [x] Add unit tests for scheduling
-- [ ] Add GitHub Actions CI
+- [x] Add GitHub Actions CI
 - [ ] Add logging
 
 ## License

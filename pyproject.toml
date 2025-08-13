@@ -9,8 +9,24 @@ requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
 keywords = ["postman", "json", "export", "cli", "crontab"]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Terminals",
+    "Topic :: Utilities",
+    "Environment :: Console",
+]
 
 dependencies = ["asyncclick", "httpx", "anyio", "aiofiles"]
+
+[project.urls]
+Homepage = "https://github.com/sergey-vernyk/PostmanCollectionExporter"
+Issues = "https://github.com/sergey-vernyk/PostmanCollectionExporter/issues"
+Repository = "https://github.com/sergey-vernyk/PostmanCollectionExporter.git"
 
 [project.optional-dependencies]
 test = ["pytest", "trio", "pytest-asyncio"]
